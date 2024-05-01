@@ -10,7 +10,7 @@
 [ext_resource type="Resource" uid="uid://3adwf6hjb6tc" path="res://core/ui/menus/global_state_machine.tres" id="6_cb3tg"]
 [ext_resource type="Resource" uid="uid://c6711katx2omv" path="res://core/ui/menus/welcome_state.tres" id="7_dkb2b"]
 [ext_resource type="PackedScene" uid="uid://dywkpevv6fxls" path="res://core/ui/menus/welcome_menu.tscn" id="9_br3ec"]
-[ext_resource type="Texture2D" uid="uid://b56qc48jfwbay" path="res://assets/images/logo.svg" id="9_pxi4h"]
+[ext_resource type="Texture2D" uid="uid://b56qc48jfwbay" path="res://icon.svg" id="9_pxi4h"]
 [ext_resource type="PackedScene" uid="uid://bv456bg77othn" path="res://core/ui/menus/network_menu.tscn" id="10_j6x6f"]
 [ext_resource type="PackedScene" uid="uid://bv2jbqgyaqii3" path="res://core/ui/menus/disk_select_menu.tscn" id="11_bjekc"]
 [ext_resource type="PackedScene" uid="uid://dfuglyd5pdy3q" path="res://core/ui/menus/installer_options_menu.tscn" id="11_cvfi2"]

@@ -128,13 +128,12 @@ func repair_install(disk: Disk) -> ERROR:
 	return ERROR.OK
 
 func dd_image(to_disk: Disk) -> ERROR:
-	var image_path = "/rootfs/source/*.img"
+	var image_path = "/source/os_snapshot.img"
 	var dd_task := Command.new("dd")
 	dd_task.args = [
-		"if=/dev/zero",
-		"of=/dev/null",
-		"bs=100k",
-		"count=500000"
+		"if=" + image_path,
+		"of=" + to_disk.path,
+		"bs=100k"
 	]
 	if await dd_task.execute() != OK:
 		last_error = "dd command failed"
