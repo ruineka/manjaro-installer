@@ -9,7 +9,7 @@ var args := PackedStringArray()
 var stdout: String
 var code := 0
 var log_error := true
-var dry_run := true
+var dry_run := false
 
 
 func _init(command: String = "", arguments: PackedStringArray = []) -> void:

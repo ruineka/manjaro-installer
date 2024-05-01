@@ -67,10 +67,35 @@ func _on_next_pressed() -> void:
 		next_button.grab_focus.call_deferred()
 		return
 	
-	_start_bootstrap(disk)
+	_start_dd(disk)
 
+# Perform the dd
+func _start_dd(disk: Installer.Disk) -> void:
+	print("DD to disk")
+	var dialog := get_tree().get_first_node_in_group("dialog") as Dialog
+	var progress := get_tree().get_first_node_in_group("progress_dialog") as ProgressDialog
 
+	# Set up the progress bar
+	progress.value = 0
+	var on_progress := func(percent: float):
+		progress.value = percent * 100
+	installer.bootstrap_progressed.connect(on_progress)
+	progress.open("Flashing image to disk")
+
+	# Wait for the bootstrapping to complete
+	var err := await installer.dd_image(disk)
+	installer.bootstrap_progressed.disconnect(on_progress)
+	progress.close()
+	if err != OK:
+		var err_msg := installer.last_error
+		dialog.open("DD command failed:\n" + err_msg, "OK", "Cancel")
+		await dialog.choice_selected
+		next_button.grab_focus.call_deferred()
+		return
+
+	state_machine.set_state([])
 # Perform the bootstrapping
+
 func _start_bootstrap(disk: Installer.Disk) -> void:
 	print("Bootstrapping disk")
 	var dialog := get_tree().get_first_node_in_group("dialog") as Dialog
@@ -84,7 +109,7 @@ func _start_bootstrap(disk: Installer.Disk) -> void:
 	progress.open("Bootstrapping disk")
 
 	# Wait for the bootstrapping to complete
-	var err := await installer.bootstrap(disk)
+	var err := await installer.dd_image(disk)
 	installer.bootstrap_progressed.disconnect(on_progress)
 	progress.close()
 	if err != OK:
