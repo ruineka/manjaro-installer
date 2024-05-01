@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=3 uid="uid://bnqa2hj6mcr5g"]
+[gd_scene load_steps=19 format=3 uid="uid://bnqa2hj6mcr5g"]
 
 [ext_resource type="Script" path="res://main.gd" id="1_0wpcj"]
 [ext_resource type="Theme" uid="uid://dqwrm87h6ywom" path="res://assets/themes/manjaro_theme.tres" id="1_43tku"]
@@ -17,6 +17,7 @@
 [ext_resource type="PackedScene" uid="uid://xg7knkqfyxq2" path="res://core/ui/menus/advanced_install_menu.tscn" id="14_c47kf"]
 [ext_resource type="PackedScene" uid="uid://ck8pudkat23b8" path="res://core/ui/components/progress_dialog.tscn" id="14_jvved"]
 [ext_resource type="PackedScene" uid="uid://cy0vf4kx6v4u2" path="res://core/ui/menus/default_install_menu.tscn" id="15_ry28q"]
+[ext_resource type="PackedScene" uid="uid://pbrqu7umna0x" path="res://core/ui/menus/completed_install_menu.tscn" id="16_6s7wf"]
 
 [node name="Main" type="Control"]
 layout_mode = 3
@@ -128,6 +129,10 @@ visible = false
 layout_mode = 2
 
 [node name="DefaultInstallMenu" parent="PanelContainer/MarginContainer/HBoxContainer/ContentContainer" instance=ExtResource("15_ry28q")]
+visible = false
+layout_mode = 2
+
+[node name="CompletedInstallMenu" parent="PanelContainer/MarginContainer/HBoxContainer/ContentContainer" instance=ExtResource("16_6s7wf")]
 visible = false
 layout_mode = 2
 

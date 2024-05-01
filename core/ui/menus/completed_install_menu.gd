@@ -17,4 +17,4 @@ func _on_yes_pressed() -> void:
 	if await reboot.execute() != OK:
 		return
 func _on_no_pressed() -> void:
-	pass
+	get_tree().quit(1)
