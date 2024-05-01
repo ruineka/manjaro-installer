@@ -1,8 +1,8 @@
 extends Control
 
 var state_machine := load("res://core/ui/menus/global_state_machine.tres") as StateMachine
-var frzr := load("res://core/systems/frzr/frzr.tres") as Frzr
-var disks := frzr.get_available_disks()
+var installer := load("res://core/systems/installer/installer.tres") as Installer
+var disks := installer.get_available_disks()
 
 @onready var tree := $%Tree
 @onready var next_button := $%NextButton
@@ -43,7 +43,7 @@ func _on_next_pressed() -> void:
 		return
 	
 	# Get the disk from the selected tree item
-	var disk := item.get_metadata(0) as Frzr.Disk
+	var disk := item.get_metadata(0) as Installer.Disk
 	print("Selected disk: " + disk.path)
 
 	# Check if the given disk already has an installation or not
@@ -71,7 +71,7 @@ func _on_next_pressed() -> void:
 
 
 # Perform the bootstrapping
-func _start_bootstrap(disk: Frzr.Disk) -> void:
+func _start_bootstrap(disk: Installer.Disk) -> void:
 	print("Bootstrapping disk")
 	var dialog := get_tree().get_first_node_in_group("dialog") as Dialog
 	var progress := get_tree().get_first_node_in_group("progress_dialog") as ProgressDialog
@@ -80,15 +80,15 @@ func _start_bootstrap(disk: Frzr.Disk) -> void:
 	progress.value = 0
 	var on_progress := func(percent: float):
 		progress.value = percent * 100
-	frzr.bootstrap_progressed.connect(on_progress)
+	installer.bootstrap_progressed.connect(on_progress)
 	progress.open("Bootstrapping disk")
 
 	# Wait for the bootstrapping to complete
-	var err := await frzr.bootstrap(disk)
-	frzr.bootstrap_progressed.disconnect(on_progress)
+	var err := await installer.bootstrap(disk)
+	installer.bootstrap_progressed.disconnect(on_progress)
 	progress.close()
 	if err != OK:
-		var err_msg := frzr.last_error
+		var err_msg := installer.last_error
 		dialog.open("System bootstrap failed:\n" + err_msg, "OK", "Cancel")
 		await dialog.choice_selected
 		next_button.grab_focus.call_deferred()
@@ -99,7 +99,7 @@ func _start_bootstrap(disk: Frzr.Disk) -> void:
 
 
 # Perform a repair
-func _start_repair(disk: Frzr.Disk) -> void:
+func _start_repair(disk: Installer.Disk) -> void:
 	print("Repairing install")
 	var dialog := get_tree().get_first_node_in_group("dialog") as Dialog
 	var progress := get_tree().get_first_node_in_group("progress_dialog") as ProgressDialog
@@ -108,15 +108,15 @@ func _start_repair(disk: Frzr.Disk) -> void:
 	progress.value = 0
 	var on_progress := func(percent: float):
 		progress.value = percent * 100
-	frzr.repair_progressed.connect(on_progress)
+	installer.repair_progressed.connect(on_progress)
 	progress.open("Repairing installation")
 	
 	# Wait for the repair to complete
-	var err := await frzr.repair_install(disk)
-	frzr.repair_progressed.disconnect(on_progress)
+	var err := await installer.repair_install(disk)
+	installer.repair_progressed.disconnect(on_progress)
 	progress.close()
 	if err != OK:
-		dialog.open("Failed to repair installation:\n" + frzr.last_error, "OK", "Cancel")
+		dialog.open("Failed to repair installation:\n" + installer.last_error, "OK", "Cancel")
 		await dialog.choice_selected
 		next_button.grab_focus.call_deferred()
 		return
@@ -132,7 +132,7 @@ func _start_post_bootstrap() -> void:
 	var progress := get_tree().get_first_node_in_group("progress_dialog") as ProgressDialog
 	
 	# Copy over all network configuration from the live session to the system
-	await frzr.copy_network_config()
+	await installer.copy_network_config()
 	
 	# Grab the steam bootstrap for first boot
 	var url := "https://steamdeck-packages.steamos.cloud/archlinux-mirror/jupiter-main/os/x86_64/steam-jupiter-stable-1.0.0.76-1-x86_64.pkg.tar.zst"

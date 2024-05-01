@@ -1,8 +1,7 @@
 [gd_scene load_steps=18 format=3 uid="uid://bnqa2hj6mcr5g"]
 
 [ext_resource type="Script" path="res://main.gd" id="1_0wpcj"]
-[ext_resource type="Theme" uid="uid://dmq3erfi6r4yd" path="res://assets/themes/chimera_theme.tres" id="1_14sjn"]
-[ext_resource type="Texture2D" uid="uid://dnywtgcvjgbg" path="res://assets/images/logo.svg" id="2_rvltf"]
+[ext_resource type="Theme" uid="uid://dqwrm87h6ywom" path="res://assets/themes/manjaro_theme.tres" id="1_43tku"]
 [ext_resource type="PackedScene" uid="uid://cl4f5no6oogd1" path="res://core/systems/input/input_watcher.tscn" id="3_5wnjd"]
 [ext_resource type="PackedScene" uid="uid://bw8113ocotx2r" path="res://core/systems/effects/fade_effect.tscn" id="3_ayd5a"]
 [ext_resource type="PackedScene" uid="uid://eqqk1uve143x" path="res://core/ui/components/dialog.tscn" id="4_er608"]
@@ -10,6 +9,7 @@
 [ext_resource type="PackedScene" uid="uid://b76dvfuouhlwd" path="res://core/systems/state/state_updater.tscn" id="5_qlmqs"]
 [ext_resource type="Resource" uid="uid://3adwf6hjb6tc" path="res://core/ui/menus/global_state_machine.tres" id="6_cb3tg"]
 [ext_resource type="Resource" uid="uid://c6711katx2omv" path="res://core/ui/menus/welcome_state.tres" id="7_dkb2b"]
+[ext_resource type="Texture2D" uid="uid://b56qc48jfwbay" path="res://assets/images/icon.svg" id="9_88uyb"]
 [ext_resource type="PackedScene" uid="uid://dywkpevv6fxls" path="res://core/ui/menus/welcome_menu.tscn" id="9_br3ec"]
 [ext_resource type="PackedScene" uid="uid://bv456bg77othn" path="res://core/ui/menus/network_menu.tscn" id="10_j6x6f"]
 [ext_resource type="PackedScene" uid="uid://bv2jbqgyaqii3" path="res://core/ui/menus/disk_select_menu.tscn" id="11_bjekc"]
@@ -25,7 +25,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme = ExtResource("1_14sjn")
+theme = ExtResource("1_43tku")
 script = ExtResource("1_0wpcj")
 
 [node name="InputWatcher" parent="." instance=ExtResource("3_5wnjd")]
@@ -95,7 +95,7 @@ layout_mode = 2
 offset_right = 378.0
 offset_bottom = 480.0
 size_flags_horizontal = 3
-texture = ExtResource("2_rvltf")
+texture = ExtResource("9_88uyb")
 stretch_mode = 5
 
 [node name="ContentContainer" type="MarginContainer" parent="PanelContainer/MarginContainer/HBoxContainer"]

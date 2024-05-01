@@ -1,6 +1,6 @@
 extends Control
 
-var frzr := load("res://core/systems/frzr/frzr.tres") as Frzr
+var installer := load("res://core/systems/installer/installer.tres") as Installer
 
 @onready var next_button := $%NextButton
 @onready var checkbox_fw := $%FirmwareCheckBox
@@ -17,9 +17,9 @@ func _ready() -> void:
 func _on_next_pressed() -> void:
 	# Set frzr to target unstable builds if selected
 	if checkbox_unstable.button_pressed:
-		frzr.target = "unstable"
+		installer.target = "unstable"
 	else:
-		frzr.target = "stable"
+		installer.target = "stable"
 	
 	# Enable firmware overrides
 	if checkbox_fw.button_pressed:

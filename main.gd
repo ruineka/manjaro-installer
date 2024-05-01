@@ -2,7 +2,7 @@ extends Control
 
 const MOUNT_PATH := "/tmp/frzr_root"
 
-var frzr := load("res://core/systems/frzr/frzr.tres") as Frzr
+var installer := load("res://core/systems/installer/installer.tres") as Installer
 
 @onready var dialog := $%Dialog as Dialog
 @onready var progress_dialog := $%ProgressDialog as ProgressDialog
@@ -28,7 +28,7 @@ func run():
 		get_tree().quit(1)
 		return
 
-	if frzr.get_available_disks().size() == 0:
+	if installer.get_available_disks().size() == 0:
 		var msg := "No available disks were detected. Unable to proceed with installation."
 		dialog.open(msg, "OK", "Cancel")
 		await dialog.choice_selected
@@ -49,7 +49,7 @@ func _input(event: InputEvent) -> void:
 	if state_machine.stack_length() > 1:
 		return
 
-	var msg := "Exit the ChimeraOS installer?"
+	var msg := "Exit the Manjaro installer?"
 	dialog.open(msg, "No", "Yes")
 	var should_continue := await dialog.choice_selected as bool
 	
