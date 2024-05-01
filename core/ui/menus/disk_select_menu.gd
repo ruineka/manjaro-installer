@@ -6,6 +6,8 @@ var disks := installer.get_available_disks()
 
 @onready var tree := $%Tree
 @onready var next_button := $%NextButton
+@onready var yes_button := $%YesButton
+@onready var no_button := $%NoButton
 @onready var http := $%HTTPFileDownloader as HTTPFileDownloader
 
 
@@ -33,7 +35,6 @@ func _ready() -> void:
 		disk_item.set_text(1, disk.model)
 		disk_item.set_text(2, disk.size)
 		disk_item.set_metadata(0, disk)
-
 
 ## Invoked when the Next button is pressed
 func _on_next_pressed() -> void:
@@ -79,12 +80,12 @@ func _start_dd(disk: Installer.Disk) -> void:
 	progress.value = 0
 	var on_progress := func(percent: float):
 		progress.value = percent * 100
-	installer.bootstrap_progressed.connect(on_progress)
+	installer.dd_progressed.connect(on_progress)
 	progress.open("Flashing image to disk")
 
 	# Wait for the bootstrapping to complete
 	var err := await installer.dd_image(disk)
-	installer.bootstrap_progressed.disconnect(on_progress)
+	installer.dd_progressed.disconnect(on_progress)
 	progress.close()
 	if err != OK:
 		var err_msg := installer.last_error
@@ -93,7 +94,9 @@ func _start_dd(disk: Installer.Disk) -> void:
 		next_button.grab_focus.call_deferred()
 		return
 
-	state_machine.set_state([])
+# Switch menus
+	var completed_state := load("res://core/ui/menus/completed_install_state.tres")
+	state_machine.set_state([completed_state])
 # Perform the bootstrapping
 
 func _start_bootstrap(disk: Installer.Disk) -> void:

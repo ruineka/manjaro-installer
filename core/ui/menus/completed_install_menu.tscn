@@ -1,0 +1,78 @@
+[gd_scene load_steps=7 format=3 uid="uid://pbrqu7umna0x"]
+
+[ext_resource type="PackedScene" uid="uid://shvyhrv5sx3v" path="res://core/systems/state/state_watcher.tscn" id="1_5p5ij"]
+[ext_resource type="Script" path="res://core/ui/menus/completed_install_menu.gd" id="1_30yep"]
+[ext_resource type="Resource" uid="uid://cabfr0ykijdt" path="res://core/ui/menus/completed_install_state.tres" id="2_v7l85"]
+[ext_resource type="PackedScene" uid="uid://ekhjpmat02f8" path="res://core/systems/effects/slide_effect.tscn" id="3_iujqm"]
+[ext_resource type="PackedScene" uid="uid://bw8113ocotx2r" path="res://core/systems/effects/fade_effect.tscn" id="4_lvinj"]
+[ext_resource type="PackedScene" uid="uid://dlqe32cc551jc" path="res://core/systems/focus/focus_grabber.tscn" id="5_uqpvq"]
+
+[node name="CompletedInstallMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_30yep")
+
+[node name="StateWatcher" parent="." instance=ExtResource("1_5p5ij")]
+state = ExtResource("2_v7l85")
+
+[node name="SlideEffect" parent="StateWatcher" node_paths=PackedStringArray("target") instance=ExtResource("3_iujqm")]
+target = NodePath("../../Spacer")
+slide_speed = 0.4
+margin = 0
+on_signal = "state_entered"
+slide_out_signal = "state_exited"
+on_signal = "state_entered"
+
+[node name="FadeEffect" parent="StateWatcher" node_paths=PackedStringArray("target") instance=ExtResource("4_lvinj")]
+target = NodePath("../..")
+on_signal = "state_entered"
+fade_out_signal = "state_exited"
+on_signal = "state_entered"
+
+[node name="FocusGrabber" parent="StateWatcher/FadeEffect" node_paths=PackedStringArray("target") instance=ExtResource("5_uqpvq")]
+target = NodePath("../../../Spacer/VBoxContainer/GridContainer/YesButton")
+on_signal = "effect_finished"
+
+[node name="Spacer" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Spacer"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 15
+alignment = 1
+
+[node name="Label" type="Label" parent="Spacer/VBoxContainer"]
+layout_mode = 2
+text = "The installation has completed successfully, would you like to reboot?"
+
+[node name="GridContainer" type="GridContainer" parent="Spacer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/h_separation = 20
+theme_override_constants/v_separation = 10
+columns = 2
+
+[node name="YesButton" type="Button" parent="Spacer/VBoxContainer/GridContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Yes"
+
+[node name="NoButton" type="Button" parent="Spacer/VBoxContainer/GridContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "No"

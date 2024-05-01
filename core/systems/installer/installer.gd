@@ -2,6 +2,7 @@ extends Resource
 class_name Installer
 
 signal bootstrap_progressed(percent: float)
+signal dd_progressed(percent: float)
 signal install_progressed(percent: float)
 signal repair_progressed(percent: float)
 
@@ -138,7 +139,7 @@ func dd_image(to_disk: Disk) -> ERROR:
 	if await dd_task.execute() != OK:
 		last_error = "dd command failed"
 		return ERROR.PARTITIONING_FAILED
-	bootstrap_progressed.emit(0.2)
+	dd_progressed.emit(0.2)
 	return ERROR.OK
 ## Bootstrap the given disk
 ## https://github.com/ChimeraOS/frzr/blob/master/frzr-bootstrap
