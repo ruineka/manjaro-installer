@@ -20,6 +20,7 @@ var threads: Array[Thread] = []
 var semaphore := Semaphore.new()
 var mutex := Mutex.new()
 var queue: Array[Task] = []
+var logger := Log.get_logger("ThreadPool", Log.LEVEL.INFO)
 
 
 ## A queued task to run in the thread pool
@@ -35,6 +36,10 @@ func _notification(what: int):
 
 ## Starts the threads for the thread pool
 func start() -> void:
+	# Don't start if run from the editor (during doc generation)
+	if Engine.is_editor_hint():
+		logger.info("Not starting. Ran from editor.")
+		return
 	if is_running():
 		return
 	for i in range(size):
@@ -86,7 +91,10 @@ func exec(method: Callable) -> Variant:
 
 
 ## Each thread in the pool waits for tasks and executes methods from the queue
-func _process(_id: int) -> void:
+func _process(id: int) -> void:
+	logger.info("Started thread: " + str(id))
+	# TODO: Fix unsafe thread operations
+	Thread.set_thread_safety_checks_enabled(false)
 	while true:
 		semaphore.wait()
 		mutex.lock()
@@ -100,6 +108,7 @@ func _process(_id: int) -> void:
 		var task := queue.pop_front() as Task
 		mutex.unlock()
 		
+		logger.debug("Processing task in thread " + str(id))
 		_async_call(task)
 
 

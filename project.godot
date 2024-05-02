@@ -33,6 +33,10 @@ window/handheld/orientation=4
 
 movie_writer/movie_file="/home/william/Projects/godot/chimeraos-installer/videos/capture.avi"
 
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/gut/plugin.cfg")
+
 [rendering]
 
 renderer/rendering_method="gl_compatibility"

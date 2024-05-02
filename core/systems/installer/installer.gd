@@ -20,7 +20,11 @@ enum ERROR {
 
 var last_error := ""
 var target := "stable"
+var shared_thread: SharedThread
+var underlay_log: FileAccess
+var underlay_process: InteractiveProcess
 
+var logger := Log.get_logger("Main", Log.LEVEL.INFO)
 
 ## Return the available disks
 func get_available_disks() -> Array[Disk]:
@@ -126,19 +130,46 @@ func repair_install(disk: Disk) -> ERROR:
 	repair_progressed.emit(1.0)
 	
 	return ERROR.OK
+func _start_underlay_process(args: Array, log_path: String) -> void:
+	# Start the shared thread we use for logging.
+	shared_thread = SharedThread.new()
+	shared_thread.start()
 
+	# Setup logging
+	underlay_log = FileAccess.open(log_path, FileAccess.WRITE)
+	var error := underlay_log.get_open_error()
+	if error != OK:
+		logger.warn("Got error opening log file.")
+	else:
+		logger.info("Started logging underlay process at " + log_path)
+	var command: String = args[0]
+	args.remove_at(0)
+	underlay_process = InteractiveProcess.new(command, args)
+	if underlay_process.start() != OK:
+		logger.error("Failed to start child process.")
+		return
+	var logger_func := func(delta: float):
+		underlay_process.output_to_log_file(underlay_log)
+	shared_thread.add_process(logger_func)
+	
 func dd_image(to_disk: Disk) -> ERROR:
 	var image_path = "/source/os_snapshot.img"
-	var dd_task := Command.new("dd")
-	dd_task.args = [
-		"if=" + image_path,
-		"of=" + to_disk.path,
-		"bs=100k"
+
+	var bash_args = [
+		"-c",
+		"dd if=/dev/zero | pv | of=/dev/null"
 	]
-	if await dd_task.execute() != OK:
-		last_error = "dd command failed"
-		return ERROR.PARTITIONING_FAILED
-	dd_progressed.emit(0.2)
+	
+	var log_path := OS.get_environment("HOME") + "/.underlay-stdout.log"
+	_start_underlay_process(["bash"] + bash_args, log_path)
+	
+	var flashing = true
+	while flashing:
+		var stdout = underlay_process.read()
+		#TODO Parse stdout and emit progress
+		if not underlay_process.is_running():
+			flashing = false
+
 	return ERROR.OK
 ## Bootstrap the given disk
 ## https://github.com/ChimeraOS/frzr/blob/master/frzr-bootstrap
