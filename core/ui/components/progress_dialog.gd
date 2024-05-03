@@ -44,7 +44,7 @@ signal cancelled
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	cancel_button.button_up.connect(_on_selected.bind())
+	pass #cancel_button.button_up.connect(_on_selected.bind())
 
 
 ## Invoked when confirm or cancel is selected

@@ -87,6 +87,7 @@ alignment = 1
 
 [node name="CancelButton" type="Button" parent="Spacer/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer"]
 unique_name_in_owner = true
+visible = false
 layout_mode = 2
 size_flags_horizontal = 3
 focus_neighbor_top = NodePath(".")

@@ -158,6 +158,7 @@ func _start_underlay_process(args: Array, log_path: String) -> void:
 func dd_flash(delta: float):
 	var image_path = "/source/os_snapshot.img"
 	var size_command = "$(stat -c %s " + image_path + " | awk '{print int($1 / 1024 / 1024)}')"
+	var fake_path = "/dev/null" # used for debugging
 	var bash_command = [
 	"dd if=" + image_path + " | pv -s " + size_command + "M -n | dd of=" + flash_path + " bs=100k"
 	]
