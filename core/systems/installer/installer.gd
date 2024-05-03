@@ -24,6 +24,9 @@ var shared_thread: SharedThread
 var underlay_log: FileAccess
 var underlay_process: InteractiveProcess
 
+var flash_finished = false
+var flash_path = ""
+
 var logger := Log.get_logger("Main", Log.LEVEL.INFO)
 
 ## Return the available disks
@@ -132,8 +135,8 @@ func repair_install(disk: Disk) -> ERROR:
 	return ERROR.OK
 func _start_underlay_process(args: Array, log_path: String) -> void:
 	# Start the shared thread we use for logging.
-	shared_thread = SharedThread.new()
-	shared_thread.start()
+	#shared_thread = SharedThread.new()
+	#shared_thread.start()
 
 	# Setup logging
 	underlay_log = FileAccess.open(log_path, FileAccess.WRITE)
@@ -151,17 +154,17 @@ func _start_underlay_process(args: Array, log_path: String) -> void:
 	var logger_func := func(delta: float):
 		underlay_process.output_to_log_file(underlay_log)
 	#shared_thread.add_process(logger_func)
-	
-func dd_image(to_disk: Disk) -> ERROR:
-	var image_path = "/source/os_snapshot.img"
 
+func dd_flash(delta: float):
+	var image_path = "/source/os_snapshot.img"
+	var size_command = "$(stat -c %s " + image_path + " | awk '{print int($1 / 1024 / 1024)}')"
 	var bash_command = [
-		"dd if=/dev/zero | pv -n | dd of=/dev/null bs=100k count=50000"
+	"dd if=" + image_path + " | pv -s " + size_command + "M -n | dd of=" + flash_path + " bs=100k"
 	]
 	
 	var log_path := OS.get_environment("HOME") + "/.underlay-stdout.log"
 	_start_underlay_process(["bash","-c"] + bash_command, log_path)
-	
+
 	var flashing = true
 	var stdout = ""
 	while flashing:
@@ -176,7 +179,13 @@ func dd_image(to_disk: Disk) -> ERROR:
 			dd_progressed.emit(float(progress) / 100)
 		if not underlay_process.is_running():
 			flashing = false
-
+			flash_finished = true
+func dd_image(to_disk: Disk) -> ERROR:
+	flash_path = to_disk.path
+	# Create non-blocking thread to perform the flash
+	shared_thread = SharedThread.new()
+	shared_thread.start()
+	shared_thread.add_process(dd_flash)
 	return ERROR.OK
 ## Bootstrap the given disk
 ## https://github.com/ChimeraOS/frzr/blob/master/frzr-bootstrap

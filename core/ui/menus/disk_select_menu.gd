@@ -85,18 +85,18 @@ func _start_dd(disk: Installer.Disk) -> void:
 
 	# Wait for the bootstrapping to complete
 	var err := await installer.dd_image(disk)
-	installer.dd_progressed.disconnect(on_progress)
-	progress.close()
-	if err != OK:
-		var err_msg := installer.last_error
-		dialog.open("DD command failed:\n" + err_msg, "OK", "Cancel")
-		await dialog.choice_selected
-		next_button.grab_focus.call_deferred()
-		return
-
-# Switch menus
-	var completed_state := load("res://core/ui/menus/completed_install_state.tres")
-	state_machine.set_state([completed_state])
+	if installer.flash_finished:
+		installer.dd_progressed.disconnect(on_progress)
+		progress.close()
+		if err != OK:
+			var err_msg := installer.last_error
+			dialog.open("DD command failed:\n" + err_msg, "OK", "Cancel")
+			await dialog.choice_selected
+			next_button.grab_focus.call_deferred()
+			return
+		# Switch menus
+		var completed_state := load("res://core/ui/menus/completed_install_state.tres")
+		state_machine.set_state([completed_state])
 # Perform the bootstrapping
 
 func _start_bootstrap(disk: Installer.Disk) -> void:
@@ -112,7 +112,7 @@ func _start_bootstrap(disk: Installer.Disk) -> void:
 	progress.open("Bootstrapping disk")
 
 	# Wait for the bootstrapping to complete
-	var err := await installer.dd_image(disk)
+	var err := await installer.bootstrap(disk)
 	installer.bootstrap_progressed.disconnect(on_progress)
 	progress.close()
 	if err != OK:
