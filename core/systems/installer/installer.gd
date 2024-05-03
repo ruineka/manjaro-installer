@@ -155,18 +155,24 @@ func _start_underlay_process(args: Array, log_path: String) -> void:
 func dd_image(to_disk: Disk) -> ERROR:
 	var image_path = "/source/os_snapshot.img"
 
-	var bash_args = [
-		"-c",
-		"dd if=/dev/zero | pv | of=/dev/null"
+	var bash_command = [
+		"dd if=/dev/zero | pv -n | dd of=/dev/null"
 	]
 	
 	var log_path := OS.get_environment("HOME") + "/.underlay-stdout.log"
-	_start_underlay_process(["bash"] + bash_args, log_path)
+	_start_underlay_process(["bash","-c"] + bash_command, log_path)
 	
 	var flashing = true
+	var stdout = ""
 	while flashing:
-		var stdout = underlay_process.read()
-		#TODO Parse stdout and emit progress
+		stdout = underlay_process.read()
+		var regex = RegEx.new()
+		regex.compile("[0-9]")
+		var result = regex.search(stdout)
+		# pv -n should output a whole number for each percent on a new line
+		# Divide by 100 to get a float to pass to the progress bar. 1 / 100 = 0.01
+		if result:
+			dd_progressed.emit(int(result) / 100)
 		if not underlay_process.is_running():
 			flashing = false
 
