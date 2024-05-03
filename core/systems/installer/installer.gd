@@ -156,7 +156,7 @@ func dd_image(to_disk: Disk) -> ERROR:
 	var image_path = "/source/os_snapshot.img"
 
 	var bash_command = [
-		"dd if=/dev/zero | pv -n| dd of=/dev/null bs=100k count=50000"
+		"dd if=/dev/zero | pv -n | dd of=/dev/null bs=100k count=50000"
 	]
 	
 	var log_path := OS.get_environment("HOME") + "/.underlay-stdout.log"

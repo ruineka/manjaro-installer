@@ -9,7 +9,7 @@ func _ready() -> void:
 
 func get_current_card_device() -> String:
 	var cmd := Command.new("glxinfo")
-	cmd.dry_run = false
+
 	if await cmd.execute() != OK:
 		return ""
 	
