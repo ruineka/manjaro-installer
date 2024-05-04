@@ -15,7 +15,7 @@ var disks := installer.get_available_disks()
 func _ready() -> void:
 	# Listen for next button pressed
 	next_button.pressed.connect(_on_next_pressed)
-	installer.dd_status.connect(_on_complete)
+	installer.dd_status.connect(_flash_on_exit)
 	# Only enable the next button when an item is selected
 	var on_selected := func():
 		next_button.disabled = false
@@ -83,14 +83,22 @@ func _start_dd(disk: Installer.Disk) -> void:
 	installer.dd_progressed.connect(on_progress)
 	progress.open("Flashing image to disk")
 
-	var err := await installer.dd_image(disk)
+	await installer.dd_image(disk)
 
-func _on_complete():
-	var progress := get_tree().get_first_node_in_group("progress_dialog") as ProgressDialog
-	progress.close()
-	# Switch menus
-	var completed_state := load("res://core/ui/menus/completed_install_state.tres")
-	state_machine.set_state([completed_state])
+func _flash_on_exit(success: bool):
+	print("flash exited with: ", success)
+	if success:
+		var progress := get_tree().get_first_node_in_group("progress_dialog") as ProgressDialog
+		progress.close()
+		# Switch menus
+		var completed_state := load("res://core/ui/menus/completed_install_state.tres")
+		state_machine.set_state([completed_state])
+	else:
+		var progress := get_tree().get_first_node_in_group("progress_dialog") as ProgressDialog
+		progress.close()
+		var failed_state := load("res://core/ui/menus/failed_install_state.tres")
+		state_machine.set_state([failed_state])
+		return
 func _start_bootstrap(disk: Installer.Disk) -> void:
 	print("Bootstrapping disk")
 	var dialog := get_tree().get_first_node_in_group("dialog") as Dialog

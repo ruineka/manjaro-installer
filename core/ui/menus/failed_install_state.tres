@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="State" load_steps=2 format=3 uid="uid://dbsbd3v8d0h7m"]
+
+[ext_resource type="Script" path="res://core/systems/state/state.gd" id="1_ofq06"]
+
+[resource]
+script = ExtResource("1_ofq06")
+name = "failed"
+data = {}

@@ -136,8 +136,8 @@ func repair_install(disk: Disk) -> ERROR:
 	return ERROR.OK
 func _start_underlay_process(args: Array, log_path: String) -> void:
 	# Start the shared thread we use for logging.
-	#shared_thread = SharedThread.new()
-	#shared_thread.start()
+	shared_thread = SharedThread.new()
+	shared_thread.start()
 
 	# Setup logging
 	underlay_log = FileAccess.open(log_path, FileAccess.WRITE)
@@ -155,40 +155,50 @@ func _start_underlay_process(args: Array, log_path: String) -> void:
 	var logger_func := func(delta: float):
 		underlay_process.output_to_log_file(underlay_log)
 	#shared_thread.add_process(logger_func)
-func _emit_complete():
-	emit_signal("dd_status")
+func _emit_flash_exit(status: bool):
+	emit_signal("dd_status", status)
 func dd_flash():
 	var flashing = true
 	var stdout = ""
+	var progress
 	while flashing:
 		stdout = underlay_process.read()
+		if stdout != "":
+			print(stdout)
+		# Check for any errors
+		var regex_err = RegEx.new()
+		regex_err.compile("command failed")
+		var err = regex_err.search(stdout)
+		if err:
+			print("The process ended unexpectedly")
+			call_deferred("_emit_flash_exit", false)
+			flashing = false
+			break
+		# Search patterns for output percentage
 		var regex = RegEx.new()
 		regex.compile("[0-9]+$")
 		var result = regex.search(stdout)
-		# pv -n should output a whole number for each percent on a new line
-		# Divide by 100 to get a float to pass to the progress bar. 1 / 100 = 0.01
+
 		if result:
-			var progress = result.get_string()
+			progress = result.get_string()
 			dd_progressed.emit(float(progress) / 100)
 		if not underlay_process.is_running():
 			flashing = false
-			call_deferred("_emit_complete")
-func dd_image(to_disk: Disk) -> ERROR:
-	var image_path = "/source/os_snapshot.img"
+			call_deferred("_emit_flash_exit", true)
+func dd_image(to_disk: Disk) -> void:
+	var image_path = "/home/ruineka/Downloads/chimeraos-2024.01.21-x86_64.iso"
 	var size_command = "$(stat -c %s " + image_path + " | awk '{print int($1 / 1024 / 1024)}')"
 	var fake_path = "/dev/null" # used for debugging
 	var bash_command = [
-	"dd if=" + image_path + " | pv -s " + size_command + "M -n | dd of=" + flash_path + " bs=100k"
-	]
+	"dd if=" + image_path + " | pv -s " + size_command + "M -n | dd of=" + fake_path + " bs=100k || echo 'command failed'"
+	];
 
 	var log_path := OS.get_environment("HOME") + "/.underlay-stdout.log"
 	_start_underlay_process(["bash","-c"] + bash_command, log_path)
 	flash_path = to_disk.path
-	# Create non-blocking thread to perform the flash
-	shared_thread = SharedThread.new()
-	shared_thread.start()
+	# Run dd flash on it's own thread
 	shared_thread.exec(dd_flash)
-	return ERROR.OK
+	return
 ## Bootstrap the given disk
 ## https://github.com/ChimeraOS/frzr/blob/master/frzr-bootstrap
 func bootstrap(to_disk: Disk) -> ERROR:
