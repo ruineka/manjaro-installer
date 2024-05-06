@@ -49,12 +49,12 @@ func _input(event: InputEvent) -> void:
 	if state_machine.stack_length() > 1:
 		return
 
-	var msg := "Exit the Manjaro installer?"
-	dialog.open(msg, "No", "Yes")
-	var should_continue := await dialog.choice_selected as bool
+	#var msg := "Exit the Manjaro installer?"
+	#dialog.open(msg, "No", "Yes")
+	#var should_continue := await dialog.choice_selected as bool
 	
-	if not should_continue:
-		get_tree().quit(1)
-		return
-	var state := state_machine.pop_state()
-	state_machine.push_state(state)
+	#if not should_continue:
+		#get_tree().quit(1)
+		#return
+	#var state := state_machine.pop_state()
+	#state_machine.push_state(state)

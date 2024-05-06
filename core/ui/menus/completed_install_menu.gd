@@ -5,7 +5,6 @@ extends Control
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	yes_button.pressed.connect(_on_yes_pressed)
-	no_button.pressed.connect(_on_no_pressed)
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
