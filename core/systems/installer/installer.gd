@@ -186,16 +186,16 @@ func dd_flash():
 			flashing = false
 			call_deferred("_emit_flash_exit", true)
 func dd_image(to_disk: Disk) -> void:
-	var image_path = "/home/ruineka/Downloads/chimeraos-2024.01.21-x86_64.iso"
+	flash_path = to_disk.path
+	var image_path = "/source/os_snapshot.img"
 	var size_command = "$(stat -c %s " + image_path + " | awk '{print int($1 / 1024 / 1024)}')"
 	var fake_path = "/dev/null" # used for debugging
 	var bash_command = [
-	"dd if=" + image_path + " | pv -s " + size_command + "M -n | dd of=" + fake_path + " bs=100k || echo 'command failed'"
+	"dd if=" + image_path + " | pv -s " + size_command + "M -n | dd of=" + flash_path + " bs=100k || echo 'command failed'"
 	];
 
 	var log_path := OS.get_environment("HOME") + "/.underlay-stdout.log"
 	_start_underlay_process(["bash","-c"] + bash_command, log_path)
-	flash_path = to_disk.path
 	# Run dd flash on it's own thread
 	shared_thread.exec(dd_flash)
 	return
